@@ -14,7 +14,7 @@ import { HeaderComponent } from './shared/header/header.component';
   declarations: [
     AppComponent,
     LoginComponent,
-    RegisterComponent,
+    RegisterComponent,  
     NotpagefoundComponent,
     DashboardComponent,
     BreadcrumbsComponent,
