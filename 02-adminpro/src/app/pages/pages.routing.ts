@@ -8,13 +8,12 @@ import { GraficaOneComponent } from './grafica-one/grafica-one.component';
 
 const routes: Routes = [
     {
-        path: '',
+        path: 'dashboard',
         component: PagesComponent,
         children: [
-            { path: 'dashboard', component: DashboardComponent },
+            { path: '', component: DashboardComponent },
             { path: 'progress', component: ProgressComponent },
             { path: 'graphic-one', component: GraficaOneComponent },
-            { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
         ]
     }
 ];
