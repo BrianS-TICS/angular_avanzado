@@ -9,6 +9,18 @@ import { Component } from '@angular/core';
 })
 export class ProgressComponent {
 
+  progreso1 : number = 0;
+  progreso2 : number = 0;
 
+  color1 : string = 'primary'
+  color2 : string = 'yellow'
+
+  get getProgreso1(){
+    return `${this.progreso1 }%`;  
+  } 
+
+  get getProgreso2(){
+    return `${ this.progreso2 }%`;  
+  } 
 
 }
