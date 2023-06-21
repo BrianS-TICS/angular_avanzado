@@ -1,1 +1,32 @@
-<p>grafica-one works!</p>
+<div class="row">
+    <div class="col-5">
+            <app-dona 
+                title='Horas dormidas en fin de semana' 
+                [labels]="['Viernes','Sabado', 'Domingo']"
+                [percentages]="[40, 30, 30]"
+            >
+            </app-dona>
+    </div>
+    <div class="col-5">
+        <app-dona 
+            title='Precios de cigarros más comunes' 
+            [labels]="['Malboro','Blancos', 'Negros']"
+            [percentages]="[10, 90, 0]"
+        >
+        </app-dona>
+    </div>
+    <div class="col-5">
+        <app-dona 
+            title='Horas dormidas en fin de semana' 
+            [labels]="['Viernes','Sabado', 'Domingo']"
+            [percentages]="[33, 33, 33]"
+        >
+        </app-dona>
+    </div>
+    <div class="col-5">
+        <app-dona  
+
+        >
+        </app-dona>
+    </div>
+</div>
