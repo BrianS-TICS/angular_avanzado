@@ -14,15 +14,8 @@ export class SidebarService {
         { title: "Main", url: '/' },
         { title: "Progress Bar", url: 'progress' },
         { title: "Graphics", url: 'graphic-one' },
-      ]
-    },
-    {
-      title: "Dashboard",
-      icon: "mdi mdi-gauge",
-      submenu: [
-        { title: "Main", url: '/' },
-        { title: "Progress Bar", url: 'progress' },
-        { title: "Graphics", url: 'graphic-one' },
+        { title: "Promises", url: 'promesas' },
+        { title: "Rxjs", url: 'rxjs' },
       ]
     },
   ]
