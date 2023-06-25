@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Observable, retry, interval, take, map, filter } from 'rxjs';
+import { Component, OnDestroy } from '@angular/core';
+import { Observable, retry, interval, take, map, filter, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-rxjs',
@@ -7,7 +7,10 @@ import { Observable, retry, interval, take, map, filter } from 'rxjs';
   styles: [
   ]
 })
-export class RxjsComponent {
+export class RxjsComponent implements OnDestroy {
+
+
+  public intervalSubs : Subscription;
 
   constructor() {
 
@@ -23,19 +26,19 @@ export class RxjsComponent {
     //   complete: () => console.log('ObsTerminado')
     // });
 
-    this.sendInterval().subscribe({
-      next: (value) => {
-        console.log(value);
-      }
+    this.intervalSubs = this.sendInterval().subscribe({
+      next: (value) => { console.log(value) }
     })
+  }
 
+  ngOnDestroy(): void {
+      this.intervalSubs.unsubscribe();
   }
 
   public sendInterval(): Observable<number> {
     return interval(500).pipe(
       map(valor => valor + 1),
-      filter( valor => valor % 2 === 0),
-      take(10),
+      filter( valor => valor % 2 === 0 ),
       )
   }
 
