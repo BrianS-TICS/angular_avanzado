@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
@@ -6,14 +7,17 @@ import { Router } from '@angular/router';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
-  constructor(private router : Router) { }
+  constructor(
+    private router: Router,
+    private formBuilder: FormBuilder
+  ) { }
 
-  ngOnInit(): void {
-  }
 
-  login(){
+
+
+  login() {
     console.log('send');
     this.router.navigateByUrl('/');
   }
