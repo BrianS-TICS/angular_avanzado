@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Route, Router } from '@angular/router'
 import { UsersService } from 'src/app/services/users.service';
+import Swal from 'sweetalert2'
 
 @Component({
   selector: 'app-register',
@@ -13,7 +14,7 @@ export class RegisterComponent {
   public registerForm: FormGroup;
   public formSubmited: boolean = false;
 
-  constructor(private formBuilder: FormBuilder, private userService: UsersService) {
+  constructor(private formBuilder: FormBuilder, private userService: UsersService, private router: Router) {
     this.registerForm = this.formBuilder.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -29,13 +30,42 @@ export class RegisterComponent {
   public createUser() {
     this.formSubmited = true;
 
+    if (this.registerForm.invalid) {
+      return;
+    }
+
     this.userService.createUser(this.registerForm.value).subscribe(
       {
         next: (response) => {
-          console.log(response);
+          
+          const swalDialog = Swal.fire({
+            title: 'Registrado con éxito',
+            text: '',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+          })
+          
+          localStorage.setItem('userToken', response.token)
+          
+          swalDialog.finally( () => {
+            this.router.navigate(['./dashboard']);
+          })
+
+          this.formSubmited = false;
+          this.registerForm.reset();
+
         },
         error: (error) => {
           console.log(error.error.msg);
+
+          Swal.fire({
+            title: 'Error',
+            text: error.error.msg,
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          })
+
+
         }, complete: () => {
 
         }

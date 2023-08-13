@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UserRegisterForm } from '../interfaces/user-register-form.interface';
-import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
+
+import { UserRegisterForm } from '../interfaces/user-register-form.interface';
+import { UserLoginForm } from '../interfaces/user-login-form.interface';
+import { environment } from 'src/environments/environment';
 
 const base_url = environment.base_url;
 
@@ -14,9 +16,12 @@ export class UsersService {
   constructor(private http: HttpClient) { }
 
   public createUser(formData: UserRegisterForm) : Observable<any> {
-    console.log('creando usuario ' + formData);
     return this.http.post(`${base_url}/users`, formData);
-
   }
+
+  public loginUser(formData: UserLoginForm) : Observable<any> {
+    return this.http.post(`${base_url}/login`, formData);
+  }
+
 
 }
