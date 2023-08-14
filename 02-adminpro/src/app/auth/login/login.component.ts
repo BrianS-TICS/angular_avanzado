@@ -1,45 +1,99 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UsersService } from 'src/app/services/users.service';
 import Swal from 'sweetalert2';
+
+import { UsersService } from 'src/app/services/users.service';
+
+
+declare const google : any;
+
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+
+
+export class LoginComponent implements OnInit, AfterViewInit {
 
   public loginForm: FormGroup;
   public formSubmited: boolean = false;
+
+  @ViewChild('googleBtn') googleBtn : ElementRef;
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
     private userService: UsersService
   ) {
+    this.googleBtn = new ElementRef(null);
 
     this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: [localStorage.getItem('email') || '', [Validators.required, Validators.email]],
       password: ['', Validators.required],
+      remember: [localStorage.getItem('email') ? true : false]
     });
 
   }
 
+  ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    this.googleInit();
+  }
+
+  googleInit = () => {
+    google.accounts.id.initialize({
+      client_id: "987891107175-2fkbld58abphva7545gmc2er8a7s48o9.apps.googleusercontent.com",
+      callback: this.handleCredentialResponse
+    });
+    google.accounts.id.renderButton(
+      this.googleBtn.nativeElement,
+      { theme: "outline", size: "large" } 
+    );
+    google.accounts.id.prompt(); 
+
+  }
+
+  public handleCredentialResponse(response: any) {
+    console.log(response);
+  }
+
+  invalidField(fieldName: string): boolean {
+    let invalid = false;
+    if (this.loginForm.get(fieldName)?.invalid && this.formSubmited) {
+      invalid = true;
+      return invalid;
+    }
+    return invalid;
+  }
+
   login() {
-    console.log(this.loginForm.value);
+
+    if (this.loginForm.invalid) {
+      this.formSubmited = true;
+      return
+    }
+
     this.userService.loginUser(this.loginForm.value).subscribe(
       {
         next: (response) => {
+
+          if (this.loginForm.get('remember')?.value) {
+            localStorage.setItem('email', this.loginForm.get('email')?.value)
+          } else {
+            localStorage.removeItem('email')
+          }
+
           const swalDialog = Swal.fire({
-            title: 'Registrado con éxito',
+            title: 'Bienvenido',
             text: '',
             icon: 'success',
-            confirmButtonText: 'Aceptar'
+            confirmButtonText: 'Continuar'
           })
-
-          localStorage.setItem('userToken', response.token)
 
           swalDialog.finally(() => {
             this.router.navigate(['./dashboard']);
@@ -49,10 +103,10 @@ export class LoginComponent {
           this.loginForm.reset();
         },
         error: (error) => {
-          
+
           Swal.fire({
             title: 'Error',
-            text: error.errors.email.msg,
+            text: error.error.msg,
             icon: 'error',
             confirmButtonText: 'Aceptar'
           })
@@ -61,9 +115,6 @@ export class LoginComponent {
       }
     )
 
-
-    return;
-    this.router.navigateByUrl('/');
   }
 
 }

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { UserRegisterForm } from '../interfaces/user-register-form.interface';
 import { UserLoginForm } from '../interfaces/user-login-form.interface';
@@ -15,12 +15,22 @@ export class UsersService {
 
   constructor(private http: HttpClient) { }
 
-  public createUser(formData: UserRegisterForm) : Observable<any> {
-    return this.http.post(`${base_url}/users`, formData);
+  public createUser(formData: UserRegisterForm): Observable<any> {
+    return this.http.post(`${base_url}/users`, formData)
+      .pipe(
+        tap((response: any) => {
+          localStorage.setItem('userToken', response?.token)
+        })
+      );
   }
 
-  public loginUser(formData: UserLoginForm) : Observable<any> {
-    return this.http.post(`${base_url}/login`, formData);
+  public loginUser(formData: UserLoginForm): Observable<any> {
+    return this.http.post(`${base_url}/login`, formData)
+      .pipe(
+        tap((response: any) => {
+          localStorage.setItem('userToken', response?.token)
+        })
+      );
   }
 
 

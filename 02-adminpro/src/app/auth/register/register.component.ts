@@ -44,9 +44,7 @@ export class RegisterComponent {
             icon: 'success',
             confirmButtonText: 'Aceptar'
           })
-          
-          localStorage.setItem('userToken', response.token)
-          
+              
           swalDialog.finally( () => {
             this.router.navigate(['./dashboard']);
           })
@@ -56,7 +54,6 @@ export class RegisterComponent {
 
         },
         error: (error) => {
-          console.log(error.error.msg);
 
           Swal.fire({
             title: 'Error',
