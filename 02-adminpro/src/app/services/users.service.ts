@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 
 import { UserRegisterForm } from '../interfaces/user-register-form.interface';
 import { UserLoginForm } from '../interfaces/user-login-form.interface';
@@ -30,6 +30,31 @@ export class UsersService {
         tap((response: any) => {
           localStorage.setItem('userToken', response?.token)
         })
+      );
+  }
+
+  public loginGoogle(token: string): Observable<any> {
+    return this.http.post(`${base_url}/login/google`, { token })
+      .pipe(
+        tap((response: any) => {
+          localStorage.setItem('userToken', response?.token)
+        })
+      );
+  }
+
+  public validateUserToken(): Observable<boolean> {
+    const token = localStorage.getItem('userToken') || '';
+
+    return this.http.get(`${base_url}/login/renew`, {
+      headers: {
+        "token": token
+      }
+    })
+      .pipe(
+        tap((response: any) => {
+          localStorage.setItem('token', response.token)
+        }),
+        map((response: any) => true)
       );
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import { UsersService } from 'src/app/services/users.service';
 
 
-declare const google : any;
+declare const google: any;
 
 
 @Component({
@@ -21,12 +21,13 @@ export class LoginComponent implements OnInit, AfterViewInit {
   public loginForm: FormGroup;
   public formSubmited: boolean = false;
 
-  @ViewChild('googleBtn') googleBtn : ElementRef;
+  @ViewChild('googleBtn') googleBtn: ElementRef;
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
-    private userService: UsersService
+    private userService: UsersService,
+    private ngZone: NgZone
   ) {
     this.googleBtn = new ElementRef(null);
 
@@ -48,19 +49,30 @@ export class LoginComponent implements OnInit, AfterViewInit {
   googleInit = () => {
     google.accounts.id.initialize({
       client_id: "987891107175-2fkbld58abphva7545gmc2er8a7s48o9.apps.googleusercontent.com",
-      callback: this.handleCredentialResponse
+      callback: (response: any) => this.handleCredentialResponse(response)
     });
     google.accounts.id.renderButton(
       this.googleBtn.nativeElement,
-      { theme: "outline", size: "large" } 
+      { theme: "outline", size: "large" }
     );
-    google.accounts.id.prompt(); 
+    google.accounts.id.prompt();
 
   }
 
   public handleCredentialResponse(response: any) {
-    console.log(response);
+    this.userService.loginGoogle(response.credential).subscribe({
+      next: (response) => {
+        this.ngZone.run(() => {
+          this.router.navigate(['./dashboard']);
+        });
+      },
+      error: (error) => {
+        console.log(error);
+      },
+    })
+
   }
+
 
   invalidField(fieldName: string): boolean {
     let invalid = false;
