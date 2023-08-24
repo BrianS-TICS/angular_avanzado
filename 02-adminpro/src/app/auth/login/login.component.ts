@@ -4,9 +4,11 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 import { UsersService } from 'src/app/services/users.service';
+import { GoogleAuthService } from 'src/app/services/google-auth.service';
 
 
 declare const google: any;
+declare const gapi: any;
 
 
 @Component({
@@ -17,6 +19,7 @@ declare const google: any;
 
 
 export class LoginComponent implements OnInit, AfterViewInit {
+  public auth2: any;
 
   public loginForm: FormGroup;
   public formSubmited: boolean = false;
@@ -27,6 +30,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private userService: UsersService,
+    private googleAuth: GoogleAuthService,
     private ngZone: NgZone
   ) {
     this.googleBtn = new ElementRef(null);
@@ -40,39 +44,78 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.renderButton();
   }
 
   ngAfterViewInit(): void {
     this.googleInit();
   }
 
-  googleInit = () => {
-    google.accounts.id.initialize({
-      client_id: "987891107175-2fkbld58abphva7545gmc2er8a7s48o9.apps.googleusercontent.com",
-      callback: (response: any) => this.handleCredentialResponse(response)
-    });
-    google.accounts.id.renderButton(
-      this.googleBtn.nativeElement,
-      { theme: "outline", size: "large" }
-    );
-    google.accounts.id.prompt();
 
+  googleInit = () => {
+    this.googleAuth.initializeGoogleAuth(this.handleCredentialResponse.bind(this));
+    this.googleAuth.renderGoogleButton(this.googleBtn.nativeElement);
+    this.googleAuth.promptGoogleLogin();
   }
 
   public handleCredentialResponse(response: any) {
-    this.userService.loginGoogle(response.credential).subscribe({
-      next: (response) => {
-        this.ngZone.run(() => {
-          this.router.navigate(['./dashboard']);
-        });
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    })
+    this.userService.loginGoogle(response.credential).subscribe(
+      {
+        next: (response) => {
+          console.log(response);
+          this.ngZone.run(() => {
+            this.router.navigate(['./dashboard']);
+          });
+        },
+        error: (error) => {
+          console.log(error);
+        },
+      })
 
   }
 
+  renderButton() {
+    gapi.signin2.render('my-signin2', {
+      'scope': 'profile email',
+      'width': 240,
+      'height': 50,
+      'longtitle': true,
+      'theme': 'dark',
+    });
+
+    this.startApp();
+
+  }
+
+
+  async startApp() {
+
+    await this.userService.googleInit();
+    this.auth2 = this.userService.auth2;
+
+    this.attachSignin(document.getElementById('my-signin2'));
+
+  };
+
+
+  attachSignin(element: any) {
+
+    this.auth2.attachClickHandler(element, {},
+      (googleUser: any) => {
+        const id_token = googleUser.getAuthResponse().id_token;
+        // console.log(id_token);
+        this.userService.loginGoogle(id_token)
+          .subscribe(resp => {
+            // Navegar al Dashboard
+            this.ngZone.run(() => {
+              this.router.navigateByUrl('/');
+            })
+          });
+
+      }, (error: any) => {
+        alert(JSON.stringify(error, undefined, 2));
+      });
+  }
 
   invalidField(fieldName: string): boolean {
     let invalid = false;
@@ -100,16 +143,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
             localStorage.removeItem('email')
           }
 
-          const swalDialog = Swal.fire({
-            title: 'Bienvenido',
-            text: '',
-            icon: 'success',
-            confirmButtonText: 'Continuar'
-          })
-
-          swalDialog.finally(() => {
-            this.router.navigate(['./dashboard']);
-          })
+          this.router.navigateByUrl('/dashboard');
 
           this.formSubmited = false;
           this.loginForm.reset();

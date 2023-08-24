@@ -37,17 +37,8 @@ export class RegisterComponent {
     this.userService.createUser(this.registerForm.value).subscribe(
       {
         next: (response) => {
-          
-          const swalDialog = Swal.fire({
-            title: 'Registrado con éxito',
-            text: '',
-            icon: 'success',
-            confirmButtonText: 'Aceptar'
-          })
-              
-          swalDialog.finally( () => {
-            this.router.navigate(['./dashboard']);
-          })
+
+          this.router.navigateByUrl('/dashboard');
 
           this.formSubmited = false;
           this.registerForm.reset();
